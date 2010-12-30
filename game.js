@@ -9,7 +9,10 @@
 		ctx.fillRect(x, y, this.width, this.height);
 	};
 
-	var ctx, width = 640, height = 480;
+	var ctx, width, height, player, enemy;
+	width = 640;
+	height = 480;
+	actors = [];
 
 	ctx = (function () {
 		var canvas = document.createElement('canvas');
@@ -19,11 +22,34 @@
 		return canvas.getContext('2d');
 	}());
 
-	function update() {}
+	function update(delta) {
+		actors.forEach(function (actor) {
+			actor.update(delta);
+		});
+
+		render();
+	}
+
 	function render() {
 		ctx.fillStyle = '#000';
 		ctx.fillRect(0, 0, width, height);
+
+		actors.forEach(function (actor) {
+			actor.render();
+		});
 	}
 
-	render();
+	(function () {
+		Date.now = Date.now || (function () {
+			return new Date().getTime();
+		});
+		var lastUpdate = Date.now();
+
+		(function loop() {
+			var now = Date.now();
+			update(now - lastUpdate);
+			lastUpdate = now;
+			setTimeout(loop, 10);
+		}());
+	}());
 }());
