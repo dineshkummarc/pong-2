@@ -1,13 +1,18 @@
 (function () {
 	var Keyboard, ctx, width, height, player, enemy;
-	Keyboard = (function () {
-		var keys = new Array(256).join('x').split('x').map(function () {
-			return 0;
+	
+	function createArray(length, defaultValue) {
+		return new Array(length).join('x').split('x').map(function () {
+			return defaultValue;
 		});
+	}
+
+	Keyboard = (function () {
+		var keys = createArray(256, 0);
 
 		return ({
 			KEY_ENTER: 13,
-			KEY_SPACE: 32
+			KEY_SPACE: 32,
 			KEY_UP: 38,
 			KEY_DOWN: 40,
 
