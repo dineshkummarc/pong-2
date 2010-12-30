@@ -1,4 +1,30 @@
 (function () {
+	var Keyboard, ctx, width, height, player, enemy;
+	Keyboard = (function () {
+		var keys = new Array(256).join('x').split('x').map(function () {
+			return 0;
+		});
+
+		return ({
+			onKeyDown: function (event) {
+				console.log(event.keyCode);
+				keys[event.keyCode & 0xff] = 1;
+				event.preventDefault();
+				return false;
+			},
+
+			onKeyUp: function (event) {
+				keys[event.keyCode & 0xff] = 0;
+				event.preventDefault();
+				return false;
+			},
+
+			isKeyDown: function (key) {
+				return keys[key & 0xff] === 1;
+			}
+		});
+	}());
+
 	function Paddle(x, y) {
 		this.x = x;
 		this.y = y;
@@ -11,7 +37,6 @@
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 	};
 
-	var ctx, width, height, player, enemy;
 	width = 640;
 	height = 480;
 	actors = [];
@@ -22,6 +47,9 @@
 		var canvas = document.createElement('canvas');
 		canvas.width = width;
 		canvas.height = height;
+		canvas.tabIndex = 0;
+		canvas.addEventListener('keydown', Keyboard.onKeyDown, false);
+		canvas.addEventListener('keyup', Keyboard.onKeyUp, false);
 		document.body.appendChild(canvas);
 		return canvas.getContext('2d');
 	}());
