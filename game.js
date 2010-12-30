@@ -35,14 +35,14 @@
 		});
 	}());
 
-	function Paddle(x, y) {
+	function Rect(x, y, width, height) {
 		this.x = x;
 		this.y = y;
-		this.width = 15;
-		this.height = 100;
+		this.width = width;
+		this.height = height;
 	}
-	Paddle.prototype.update = function (delta) {};
-	Paddle.prototype.render = function (ctx) {
+	Rect.prototype.update = function (delta) {};
+	Rect.prototype.render = function (ctx) {
 		ctx.fillStyle = '#fff';
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 	};
@@ -50,8 +50,8 @@
 	width = 640;
 	height = 480;
 	actors = [];
-	actors.push(player = new Paddle(25, 200));
-	actors.push(enemy = new Paddle(width - 40, 200));
+	actors.push(player = new Rect(25, 200, 15, 100));
+	actors.push(enemy = new Rect(width - 40, 200, 15, 100));
 
 	ctx = (function () {
 		var canvas = document.createElement('canvas');
