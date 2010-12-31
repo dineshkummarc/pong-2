@@ -156,6 +156,7 @@
 		}
 	};
 
+	/* Update player based on keyboard input */
 	player.update = function (delta) {
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
 			this.y += .35 * delta;
@@ -164,6 +165,36 @@
 		}
 		this.keepInBounds();
 	};
+
+	/* Update enemy based on simple AI */
+	enemy.update = function (delta) {
+		var impactDistance, impactTime, targetY, speed;
+		speed = .25; // a little slower than the human player
+
+		if (ball.vx < 0) {
+			// Ball is moving away, AI takes a nap ..
+			return;
+		}
+		
+		// Figure out linear trajectory ..
+		impactDistance = width - ball.width - ball.x;
+		impactTime = impactDistance / (ball.vx * .25 * 1000);
+		targetY = ball.y + (ball.vy * .25 * 1000) * impactTime;
+
+		if (Math.abs(targetY - (this.y + this.height/2)) < 10) {
+			// AI doesn't need to move
+			return;
+		}
+
+		if (targetY < this.y + (this.height / 2)) {
+			// Move up if ball is going above paddle
+			speed = -speed;
+		}
+
+		this.y += speed * delta;
+		this.keepInBounds();
+	};
+
 
 	ctx = (function () {
 		var canvas = document.createElement('canvas');
