@@ -10,6 +10,10 @@
 	Keyboard = (function () {
 		var keys = createArray(256, 0);
 
+		function captureKey(key) {
+			return key === 13 || (key >= 32 && key <= 40);
+		}
+
 		return ({
 			KEY_ENTER: 13,
 			KEY_SPACE: 32,
@@ -17,13 +21,18 @@
 			KEY_DOWN: 40,
 
 			onKeyDown: function (event) {
-				console.log(event.keyCode);
+				if (!captureKey(event.keyCode)) {
+					return;
+				}
 				keys[event.keyCode & 0xff] = 1;
 				event.preventDefault();
 				return false;
 			},
 
 			onKeyUp: function (event) {
+				if (!captureKey(event.keyCode)) {
+					return;
+				}
 				keys[event.keyCode & 0xff] = 0;
 				event.preventDefault();
 				return false;
@@ -47,7 +56,7 @@
 	Rect.prototype.update = function (delta) {};
 	Rect.prototype.render = function (ctx) {
 		ctx.fillStyle = '#fff';
-		ctx.fillRect(this.x, this.y, this.width, this.height);
+		ctx.fillRect(this.x | 0, this.y | 0, this.width, this.height);
 	};
 
 	width = 640;
@@ -57,6 +66,15 @@
 	actors.push(player = new Rect(25, 200, 15, 100));
 	actors.push(enemy = new Rect(width - 40, 200, 15, 100));
 	actors.push(ball = new Rect((width / 2) - 7, (height / 2) - 7, 15, 15));
+
+	player.update = function (delta) {
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+			this.y += .35 * delta;
+		} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+			this.y -= .35 * delta;
+		}
+		this.y = Math.max(0, Math.min(height, this.y));
+	};
 
 	ctx = (function () {
 		var canvas = document.createElement('canvas');
