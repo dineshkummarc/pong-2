@@ -1,5 +1,5 @@
 (function () {
-	var Keyboard, ctx, width, height, player, enemy, ball, digits;
+	var Keyboard, State, ctx, width, height, player, enemy, ball, digits, gameState;
 	
 	function createArray(length, defaultValue) {
 		return new Array(length).join('x').split('x').map(function () {
@@ -7,15 +7,23 @@
 		});
 	}
 
+	function rand(min, max) {
+		return min + (Math.random() * (max - min));
+	}
+
+	State = {
+		STOPPED: 0,
+		PLAYING: 1
+	};
+
 	Keyboard = (function () {
 		var keys = createArray(256, 0);
 
 		function captureKey(key) {
-			return key === 13 || (key >= 32 && key <= 40);
+			return key >= 32 && key <= 40;
 		}
 
 		return ({
-			KEY_ENTER: 13,
 			KEY_SPACE: 32,
 			KEY_UP: 38,
 			KEY_DOWN: 40,
@@ -76,6 +84,13 @@
 	player.score = 0;
 	enemy.score = 0;
 
+	function reset() {
+		actors.forEach(function (actor) {
+			actor.reset();
+		});
+		gameState = State.STOPPED;
+	}
+
 	digits = [0xf99f, 0x6227, 0xe24f, 0xf31f, 0x9f11, 0x742f, 0x8f9f, 0xf248, 0xff9f, 0xf9f1].map(function (digit) {
 		var pattern = digit.toString(2);
 		while (pattern.length < 16) {
@@ -107,32 +122,34 @@
 	ball.vx = 0;
 	ball.vy = 0;
 	ball.update = function (delta) {
-		this.x += this.vx * .5 * delta;
-		this.y += this.vy * .5 * delta;
+		this.x += this.vx * .25 * delta;
+		this.y += this.vy * .25 * delta;
 		this.keepInBounds();
 
 		// Collision with player's paddle
 		if (this.x <= player.x + player.width && this.x + this.width >= player.x) {
-			if (this.y >= player.y && this.y + this.height <= player.y + player.height) {
+			if (this.y + this.height >= player.y && this.y <= player.y + player.height) {
 				this.vx = -this.vx;
+				this.x = player.x + player.width;
 				return;
 			}
 		}
 
 		// Collision with enemy's paddle
-		if (this.x + this.width >= enemy.x && this.x < enemy.x + enemy.width) {
-			if (this.y >= enemy.y && this.y + this.height <= player.y + player.height) {
+		if (this.x + this.width >= enemy.x && this.x <= enemy.x + enemy.width) {
+			if (this.y + this.height >= enemy.y && this.y <= enemy.y + enemy.height) {
 				this.vx = -this.vx;
+				this.x = enemy.x - this.width;
 				return;
 			}
 		}
 
 		if (this.x <= 0) { // Collision with left wall
 			enemy.score += 1;
-			actors.reset();
+			reset();
 		} else if (this.x >= width - this.width) { // Collision with right wall
 			player.score += 1;
-			actors.reset();
+			reset();
 		} else if (this.y <= 0 || this.y >= height - this.height) {
 			// Bounce off top/bottom wall
 			this.vy = -this.vy;
@@ -160,9 +177,18 @@
 	}());
 
 	function update(delta) {
-		actors.forEach(function (actor) {
-			actor.update(delta);
-		});
+		if (gameState === State.STOPPED && Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+			ball.vx = 2 * (Math.round(rand(0, 1)) && 1 || -1);
+			ball.vy = rand(-2, 2);
+			gameState = State.PLAYING;
+		}
+
+		if (gameState === State.PLAYING) {
+			actors.forEach(function (actor) {
+				actor.update(delta);
+			});
+		}
+		
 		render();
 	}
 
@@ -189,6 +215,8 @@
 			actor.render(ctx);
 		});
 	}
+
+	reset();
 
 	(function () {
 		Date.now = Date.now || (function () {
