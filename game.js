@@ -1,5 +1,5 @@
 (function () {
-	var Keyboard, ctx, width, height, player, enemy, ball;
+	var Keyboard, ctx, width, height, player, enemy, ball, digits;
 	
 	function createArray(length, defaultValue) {
 		return new Array(length).join('x').split('x').map(function () {
@@ -24,6 +24,7 @@
 				if (!captureKey(event.keyCode)) {
 					return;
 				}
+
 				keys[event.keyCode & 0xff] = 1;
 				event.preventDefault();
 				return false;
@@ -33,6 +34,7 @@
 				if (!captureKey(event.keyCode)) {
 					return;
 				}
+
 				keys[event.keyCode & 0xff] = 0;
 				event.preventDefault();
 				return false;
@@ -66,6 +68,35 @@
 	actors.push(player = new Rect(25, 200, 15, 100));
 	actors.push(enemy = new Rect(width - 40, 200, 15, 100));
 	actors.push(ball = new Rect((width / 2) - 7, (height / 2) - 7, 15, 15));
+
+
+	digits = [0xf99f, 0x6227, 0xe24f, 0xf31f, 0x9f11, 0x742f, 0x8f9f, 0xf248, 0xff9f, 0xf9f1].map(function (digit) {
+		var pattern = digit.toString(2);
+		while (pattern.length < 16) {
+			pattern = '0' + pattern;
+		}
+		return pattern;
+	});
+
+	(function () {
+		var pixelSize = 5;
+		digits.draw = function (number, x, y) {
+			ctx.fillStyle = '#fff';
+			('' + (number | 0)).split('').forEach(function (digit, place) {
+				digits[digit].split('').forEach(function (pixel, index) {
+					if (+pixel !== 1) {
+						return;
+					}
+
+					ctx.fillRect(
+						(x + place * 5 * 4) + 5 * place + 5 * (index % 4), 
+						y + 5 * Math.floor(index / 4),
+						pixelSize, pixelSize
+					);
+				});
+			});
+		};
+	}());
 
 	player.update = function (delta) {
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
