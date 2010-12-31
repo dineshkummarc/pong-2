@@ -80,7 +80,7 @@
 
 	(function () {
 		var pixelSize = 5;
-		digits.draw = function (number, x, y) {
+		digits.render = function (number, x, y) {
 			ctx.fillStyle = '#fff';
 			('' + (number | 0)).split('').forEach(function (digit, place) {
 				digits[digit].split('').forEach(function (pixel, index) {
@@ -89,8 +89,8 @@
 					}
 
 					ctx.fillRect(
-						(x + place * 5 * 4) + 5 * place + 5 * (index % 4), 
-						y + 5 * Math.floor(index / 4),
+						(x + place * pixelSize * 4) + pixelSize * place + pixelSize * (index % 4), 
+						y + pixelSize * Math.floor(index / 4),
 						pixelSize, pixelSize
 					);
 				});
