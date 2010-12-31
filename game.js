@@ -1,5 +1,5 @@
 (function () {
-	var Keyboard, ctx, width, height, player, enemy;
+	var Keyboard, ctx, width, height, player, enemy, ball;
 	
 	function createArray(length, defaultValue) {
 		return new Array(length).join('x').split('x').map(function () {
@@ -52,6 +52,12 @@
 	actors = [];
 	actors.push(player = new Rect(25, 200, 15, 100));
 	actors.push(enemy = new Rect(width - 40, 200, 15, 100));
+	actors.push(ball = new Rect(0, 0, 15, 15));
+	ball.center = function () {
+		this.x = (width / 2) - (this.width / 2);
+		this.y = (height / 2) - (this.height / 2);
+	};
+	ball.center();
 
 	ctx = (function () {
 		var canvas = document.createElement('canvas');
