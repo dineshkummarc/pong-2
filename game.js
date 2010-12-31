@@ -36,10 +36,13 @@
 	}());
 
 	function Rect(x, y, width, height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+		this.reset = function () {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+		};
+		this.reset();
 	}
 	Rect.prototype.update = function (delta) {};
 	Rect.prototype.render = function (ctx) {
@@ -49,15 +52,11 @@
 
 	width = 640;
 	height = 480;
+
 	actors = [];
 	actors.push(player = new Rect(25, 200, 15, 100));
 	actors.push(enemy = new Rect(width - 40, 200, 15, 100));
-	actors.push(ball = new Rect(0, 0, 15, 15));
-	ball.center = function () {
-		this.x = (width / 2) - (this.width / 2);
-		this.y = (height / 2) - (this.height / 2);
-	};
-	ball.center();
+	actors.push(ball = new Rect((width / 2) - 7, (height / 2) - 7, 15, 15));
 
 	ctx = (function () {
 		var canvas = document.createElement('canvas');
