@@ -69,6 +69,8 @@
 	actors.push(enemy = new Rect(width - 40, 200, 15, 100));
 	actors.push(ball = new Rect((width / 2) - 7, (height / 2) - 7, 15, 15));
 
+	player.score = 0;
+	enemy.score = 0;
 
 	digits = [0xf99f, 0x6227, 0xe24f, 0xf31f, 0x9f11, 0x742f, 0x8f9f, 0xf248, 0xff9f, 0xf9f1].map(function (digit) {
 		var pattern = digit.toString(2);
@@ -139,6 +141,10 @@
 
 		// Draw center square
 		ctx.strokeRect((width / 2) - 25, (height / 2) - 25, 50, 50);
+
+		// Draw scores
+		digits.render(player.score, (width / 2) - 100, 10);
+		digits.render(enemy.score, (width / 2) + 80, 10);
 
 		actors.forEach(function (actor) {
 			actor.render(ctx);
