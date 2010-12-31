@@ -75,7 +75,7 @@
 		while (pattern.length < 16) {
 			pattern = '0' + pattern;
 		}
-		return pattern;
+		return pattern.split('');
 	});
 
 	(function () {
@@ -83,7 +83,7 @@
 		digits.render = function (number, x, y) {
 			ctx.fillStyle = '#fff';
 			('' + (number | 0)).split('').forEach(function (digit, place) {
-				digits[digit].split('').forEach(function (pixel, index) {
+				digits[digit].forEach(function (pixel, index) {
 					if (+pixel !== 1) {
 						return;
 					}
