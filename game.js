@@ -73,7 +73,7 @@
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
 			this.y -= .35 * delta;
 		}
-		this.y = Math.max(0, Math.min(height, this.y));
+		this.y = Math.max(0, Math.min(height - this.height, this.y));
 	};
 
 	ctx = (function () {
@@ -97,6 +97,17 @@
 	function render() {
 		ctx.fillStyle = '#000';
 		ctx.fillRect(0, 0, width, height);
+
+		// Draw center line
+		ctx.strokeStyle = '#fff';
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		ctx.moveTo(width / 2, 0);
+		ctx.lineTo(width / 2, height);
+		ctx.stroke();
+
+		// Draw center square
+		ctx.strokeRect((width / 2) - 25, (height / 2) - 25, 50, 50);
 
 		actors.forEach(function (actor) {
 			actor.render(ctx);
