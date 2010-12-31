@@ -60,6 +60,10 @@
 		ctx.fillStyle = '#fff';
 		ctx.fillRect(this.x | 0, this.y | 0, this.width, this.height);
 	};
+	Rect.prototype.keepInBounds = function () {
+		this.x = Math.max(0, Math.min(width - this.width, this.x));
+		this.y = Math.max(0, Math.min(height - this.height, this.y));
+	};
 
 	width = 640;
 	height = 480;
@@ -100,13 +104,48 @@
 		};
 	}());
 
+	ball.vx = 0;
+	ball.vy = 0;
+	ball.update = function (delta) {
+		this.x += this.vx * .5 * delta;
+		this.y += this.vy * .5 * delta;
+		this.keepInBounds();
+
+		// Collision with player's paddle
+		if (this.x <= player.x + player.width && this.x + this.width >= player.x) {
+			if (this.y >= player.y && this.y + this.height <= player.y + player.height) {
+				this.vx = -this.vx;
+				return;
+			}
+		}
+
+		// Collision with enemy's paddle
+		if (this.x + this.width >= enemy.x && this.x < enemy.x + enemy.width) {
+			if (this.y >= enemy.y && this.y + this.height <= player.y + player.height) {
+				this.vx = -this.vx;
+				return;
+			}
+		}
+
+		if (this.x <= 0) { // Collision with left wall
+			enemy.score += 1;
+			actors.reset();
+		} else if (this.x >= width - this.width) { // Collision with right wall
+			player.score += 1;
+			actors.reset();
+		} else if (this.y <= 0 || this.y >= height - this.height) {
+			// Bounce off top/bottom wall
+			this.vy = -this.vy;
+		}
+	};
+
 	player.update = function (delta) {
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
 			this.y += .35 * delta;
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
 			this.y -= .35 * delta;
 		}
-		this.y = Math.max(0, Math.min(height - this.height, this.y));
+		this.keepInBounds();
 	};
 
 	ctx = (function () {
